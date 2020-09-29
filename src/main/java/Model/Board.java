@@ -1,12 +1,20 @@
-//it's not actually "board" class, more of "logic"
-class Board {
-    private int scoreP1;
-    private int scoreP2;
+package Model;
+
+public class Board {
+    private int[] scores = new int[2];
     private int[][] board = new int[8][8];
     private int player;
 
+    //for tests; not used in game
+    public void setBoard(int[][] newb){
+        board = newb;
+    }
+    public void setPlayer(int newPlayer){
+        this.player = newPlayer;
+    }
+
     // creating or resetting a board
-    void newBoard(){
+    public void newBoard(){
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 board[i][j]=0;
@@ -23,49 +31,42 @@ class Board {
         board[3][5] = 3;
         board[5][3] = 3;
 
-        scoreP1 = 20;
-        scoreP2 = 20;
+        scores = new int[]{20,20};
 
         this.player = 1;
     }
 
-    int get(int i, int j){ return board[i][j]; }
+    public int get(int i, int j){ return board[i][j]; }
 
 
     //string for score label
-    String getScore() { return "Score " + scoreP1 + " : " + scoreP2; }
+    public String getScore() { return "Score " + scores[0] + " : " + scores[1]; }
 
     //string for player label
-    String getPlayer() { return "Now playing as: " + (player == 1?"black":"white"); }
+    public String getPlayer() { return "Now playing as: " + (player == 1?"black":"white"); }
 
     //string for winner label
-    String getWinner() {
-        if (scoreP1 == scoreP2) return "You all lost";
-        return "Player " + (scoreP1>scoreP2 ? "1" : "2") + " won!";
+    public String getWinner() {
+        if (scores[0] == scores[1]) return "You all lost";
+        return "Player " + (scores[0] > scores[1] ? "1" : "2") + " won!";
     }
 
 
     //when disk has been placed:
-    boolean putDisc(int x, int y) {
+    public boolean putDisc(int x, int y) {
         cleanNextMoves();
 
-        //count score AND flip the enemy disks. not very OOP.
-        int scoreDiff = checkMove(player, x, y, false); //onlyCheck == false when we need to turn disks
+        //flip the enemy disks
+        checkMove(player, x, y, false); //onlyCheck == false when we need to turn disks
+
         //put the new disk itself
         board[x][y] = player;
 
-
         //update score
-        if(player == 1){
-            scoreP1 += (scoreDiff + 1)  * 10; // +1 because new disk also counts
-            scoreP2 -= scoreDiff * 10;
-        }
-        else{
-            scoreP2 += (scoreDiff + 1) * 10;
-            scoreP1 -= scoreDiff * 10;
-        }
+        scores = countScore();
 
-        player = player == 1 ? 2 : 1; // swithcing the player after the move
+        // switching the player after the move
+        player = player == 1 ? 2 : 1;
 
         return findNextMoves(player); //false means gameover
     }
@@ -75,8 +76,7 @@ class Board {
         boolean thereAreMoves = false;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                //when onlycheck == true the outputs are: 1 for possible move found and 0 for not found
-                if(checkMove(player, i, j, true) == 1){
+                if(checkMove(player, i, j, true)){
                     board[i][j] = 3;
                     thereAreMoves = true;
                 }
@@ -93,14 +93,14 @@ class Board {
         }
     }
 
-    //output when check: 0 - move not possible, 1 - possible; otherwise returns score difference
+    //output when check: false when no move possible
     //i check, in 1 direction at a time, for proper move conditions: row of enemy disks AND a player disk at the end
-    private int checkMove(int player, int i, int j, boolean onlyCheck) {
+    public boolean checkMove(int player, int i, int j, boolean onlyCheck) {
         //need tile to be free for move
-        if (board[i][j] != 0) return 0;
+        if (board[i][j] != 0) return false;
 
         // movingX and movingY; c is count
-        int mX, mY, c, sum = 0;
+        int mX, mY, c;
         int enemy = (player == 1) ? 2 : 1;
 
         // cycle for all 8 possible directions (complicated but better than 85 lines of repeats?)
@@ -119,7 +119,7 @@ class Board {
 
                     if (board[mX][mY] == player && c > 0){
                         //valid move found!
-                        if (onlyCheck) return 1;
+                        if (onlyCheck) return true;
 
                         //now turn the disks in ONE direction while moving back
                         for(int it = c; it > 0; it--) {
@@ -127,8 +127,6 @@ class Board {
                             mY -= diry;
                             this.board[mX][mY] = player; }
 
-                        //add score for ONE direction to the sum
-                        sum += c;
                         break; //no need to move the same dir anymore
 
                     } else if (board[mX][mY] == enemy){ //just keep moving
@@ -139,7 +137,18 @@ class Board {
                 }
             }
         }
-        //if we were just checking, then we found nothing, return 0; otherwise return scores
-        return onlyCheck ? 0: sum;
+        //we found nothing
+        return false;
+    }
+
+    public int[] countScore(){
+        int[] scores = new int[2];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j]==1) scores[0] += 10;
+                if (board[i][j]==2) scores[1] += 10;
+            }
+        }
+        return scores;
     }
 }
