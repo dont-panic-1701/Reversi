@@ -1,6 +1,5 @@
 package View;
 
-import Controller.Highlighted;
 import Model.Board;
 import javafx.scene.Node;
 import javafx.scene.Scene;

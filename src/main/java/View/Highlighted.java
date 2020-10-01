@@ -1,14 +1,14 @@
-package Controller;
+package View;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class Highlighted extends Rectangle {
-    public final int x, y;
+class Highlighted extends Rectangle {
+    final int x, y;
     private final static double TILE_SIZE = 100.0;
 
 
-    public Highlighted(int x, int y) {
+    Highlighted(int x, int y) {
         this.x = x;
         this.y = y;
 
