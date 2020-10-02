@@ -111,7 +111,7 @@ class Menu {
                     if (secondTry) secondTry = false;
                     update();
                 } else {
-                    if(!secondTry && !board.boardIsFull() && board.findNextMoves(board.getPlayer())) {
+                    if(!secondTry && !board.boardIsFull() && board.findNextMoves(board.getPlayer())) { //small gameover chesk
                         secondTry = true;
                         update();
                     }
