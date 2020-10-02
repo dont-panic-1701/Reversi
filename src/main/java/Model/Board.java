@@ -37,13 +37,13 @@ public class Board {
     }
 
     public int get(int i, int j){ return board[i][j]; }
-
+    public int getPlayer(){ return player; }
 
     //string for score label
     public String getScore() { return "Score " + scores[0] + " : " + scores[1]; }
 
     //string for player label
-    public String getPlayer() { return "Now playing as: " + (player == 1?"black":"white"); }
+    public String getPlayers() { return "Now playing as: " + (player == 1?"black":"white"); }
 
     //string for winner label
     public String getWinner() {
@@ -65,14 +65,16 @@ public class Board {
         //update score
         scores = countScore();
 
+        if (!findNextMoves(player == 1 ? 2 : 1)) return false; //false means gameover
+
         // switching the player after the move
         player = player == 1 ? 2 : 1;
 
-        return findNextMoves(player); //false means gameover
+        return true;
     }
 
     //checking every tile with checkMove(); if no moves left - return false
-    private boolean findNextMoves(int player){
+    public boolean findNextMoves(int player){
         boolean thereAreMoves = false;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -151,4 +153,14 @@ public class Board {
         }
         return scores;
     }
+
+    public boolean boardIsFull(){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] == 0) return false; //if there are empty spaces - board not full
+            }
+        }
+        return true;
+    }
+
 }

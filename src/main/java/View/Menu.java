@@ -15,9 +15,11 @@ class Menu {
     private static int boardSide = 800;
     private static int width = 1000;
     private Button restart = new Button("Restart");
+    private boolean secondTry = false;
 
     Scene createMenu(){
         board.newBoard();
+        secondTry = false;
         return repaint();
     }
 
@@ -26,7 +28,7 @@ class Menu {
         ReversiApp.stage.show();
     }
 
-    private void gameOver(){ //no css we die like noobs :(
+    private void gameOver(){
         Pane gOver = new Pane();
         Image img = new Image(ReversiApp.class.getResourceAsStream("/gameover.png"));
         BackgroundImage backgroundImage = new BackgroundImage(img, BackgroundRepeat.NO_REPEAT,
@@ -77,7 +79,7 @@ class Menu {
         scores.setLayoutX(boardSide + 20);
         scores.setLayoutY(50);
 
-        Label player = new Label(board.getPlayer());
+        Label player = new Label(board.getPlayers());
         player.setFont(new Font("Arial", 20));
         player.setPrefWidth(100);
         player.setTextFill(Color.WHITE);
@@ -106,9 +108,14 @@ class Menu {
             Node node = e.getPickResult().getIntersectedNode();
             if (node instanceof Highlighted) {
                 if (board.putDisc(((Highlighted) node).x, ((Highlighted) node).y)) { //false if no possible moves for next player found
+                    if (secondTry) secondTry = false;
                     update();
                 } else {
-                    gameOver();
+                    if(!secondTry && !board.boardIsFull() && board.findNextMoves(board.getPlayer())) {
+                        secondTry = true;
+                        update();
+                    }
+                    else gameOver();
                 }
 
             }});

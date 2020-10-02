@@ -19,7 +19,7 @@ public class ReversiTest {
         board.setPlayer(2); //white
 
         assertFalse(board.putDisc(0, 0)); //also a findNextMoves test
-        assertEquals("Now playing as: black",board.getPlayer()); //player change test
+        assertEquals("Now playing as: black",board.getPlayers()); //player change test
         assertEquals("Score 630 : 10", board.getScore()); //scores test
     }
     //тест для переворота и подсчёта всех возм направлений
